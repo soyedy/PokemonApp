@@ -7,11 +7,16 @@
 
 import Foundation
 
-struct PokemonAppConstants {
-  var base: URL {
-    guard let url = URL(string: "https://pokeapi.co/api/v2/pokemon") else {
-      return URL(fileURLWithPath: "")
+enum PokemonService {
+  case getBaseUrl
+  case searchByName(name: String)
+  
+  var getAddress: URL {
+    switch self {
+    case .getBaseUrl:
+      return URL(string: "https://pokeapi.co/api/v2/pokemon?limit=20")!
+    case .searchByName(let pokemonName):
+      return URL(string: "https://pokeapi.co/api/v2/pokemon/\(pokemonName)")!
     }
-    return url
   }
 }

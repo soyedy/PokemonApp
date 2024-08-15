@@ -16,10 +16,43 @@ struct PokemonListResponse: Codable {
   let results: [Pokemon]
 }
 
-struct PokemonDetail: Codable {
-  struct Sprites: Codable {
-    let front_default: String
+struct Ability: Codable {
+  let ability: AbilityDetail
+  let isHidden: Bool
+  let slot: Int
+  
+  enum CodingKeys: String, CodingKey {
+    case ability
+    case isHidden = "is_hidden"
+    case slot
   }
-  let sprites: Sprites
 }
 
+struct AbilityDetail: Codable {
+  let name: String
+  let url: String
+}
+
+struct Cries: Codable {
+  let latest: String
+  let legacy: String
+}
+
+struct Form: Codable {
+  let name: String
+  let url: String
+}
+
+struct PokemonDetailResponse: Codable {
+  let abilities: [Ability]
+  let baseExperience: Int
+  let cries: Cries
+  let forms: [Form]
+  
+  enum CodingKeys: String, CodingKey {
+    case abilities
+    case baseExperience = "base_experience"
+    case cries
+    case forms
+  }
+}

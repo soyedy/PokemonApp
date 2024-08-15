@@ -9,26 +9,45 @@ import Foundation
 
 protocol PokemonRepositoryProtocol {
   func getList() async throws -> [Pokemon]
-  func getDetail(of pokemon: Pokemon) async throws
+  func getDetail(of pokemon: String) async throws -> PokemonDetailResponse
 }
 
 struct PokemonRepository: PokemonRepositoryProtocol {
-  private let constants: PokemonAppConstants = PokemonAppConstants()
   
   func getList() async throws -> [Pokemon] {
-    let (data, response) = try await URLSession.shared.data(from: constants.base)
+    let service: PokemonService = .getBaseUrl
+    let (data, response) = try await URLSession.shared.data(from: service.getAddress)
     
-    if let httpResponse = response as? HTTPURLResponse {
-      try self.catchError(of: httpResponse)
-      let list = try self.decodeData(data: data, as: PokemonListResponse.self)
+    guard let httpResponse = response as? HTTPURLResponse else {
+      throw FetchingErrors.unexpectedError
+    }
+    
+    try catchError(of: httpResponse)
+    
+    do {
+      let list = try decodeData(data: data, as: PokemonListResponse.self)
       return list.results
-    } else {
+    } catch {
+      print("Decoding error: \(error.localizedDescription)")
       throw FetchingErrors.clientError
     }
   }
   
-  func getDetail(of pokemon: Pokemon) async throws {
+  func getDetail(of pokemon: String) async throws -> PokemonDetailResponse {
+    let (data, response) = try await URLSession.shared.data(from: URL(string: pokemon)!)
     
+    guard let httpResponse = response as? HTTPURLResponse else {
+      throw FetchingErrors.unexpectedError
+    }
+    
+    try catchError(of: httpResponse)
+    
+    do {
+      return try decodeData(data: data, as: PokemonDetailResponse.self)
+    } catch {
+      print("Decoding error: \(error.localizedDescription)")
+      throw FetchingErrors.clientError
+    }
   }
   
   private func decodeData<T: Decodable>(data: Data, as type: T.Type) throws -> T {
@@ -36,6 +55,7 @@ struct PokemonRepository: PokemonRepositoryProtocol {
     do {
       return try decoder.decode(type, from: data)
     } catch {
+      print("Decoding error: \(error.localizedDescription)")
       throw FetchingErrors.clientError
     }
   }
@@ -45,12 +65,14 @@ struct PokemonRepository: PokemonRepositoryProtocol {
     case 200...299:
       return
     case 400...499:
+      print("Client error: \(response.statusCode)")
       throw FetchingErrors.clientError
     case 500...599:
+      print("Server error: \(response.statusCode)")
       throw FetchingErrors.serverError
     default:
+      print("Unexpected error: \(response.statusCode)")
       throw FetchingErrors.unexpectedError
     }
   }
-  
 }

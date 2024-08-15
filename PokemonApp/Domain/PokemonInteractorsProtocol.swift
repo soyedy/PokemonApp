@@ -19,6 +19,7 @@ struct PokemonInteractors: PokemonInteractorsProtocol {
 
 struct GetPokemonList {
   var repository: PokemonRepositoryProtocol
+  
   func execute() async throws -> [Pokemon] {
     return try await repository.getList()
   }
@@ -26,7 +27,8 @@ struct GetPokemonList {
 
 struct GetPokemonDetail {
   var repository: PokemonRepositoryProtocol
-  func execute(with pokemon: Pokemon) async throws -> Pokemon {
-    return pokemon
+  
+  func execute(with pokemon: String) async throws -> PokemonDetailResponse {
+    return try await repository.getDetail(of: pokemon)
   }
 }
