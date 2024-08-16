@@ -30,11 +30,11 @@ final class PokemonViewModel: PokemonViewModelProtocol {
   func getPokemonsList() async {
     do {
       let list: [Pokemon] = try await interactors.getPokemonsInteractor.execute()
-      DispatchQueue.main.async {
+      await MainActor.run {
         self.pokemonList = list
       }
     } catch {
-      DispatchQueue.main.async {
+      await MainActor.run {
         self.shouldShowError = true
       }
     }
@@ -43,11 +43,11 @@ final class PokemonViewModel: PokemonViewModelProtocol {
   func getPokemonDetail(with name: String) async throws {
     do {
       let pokemonDetail: PokemonDetailResponse = try await interactors.getPokemonDetailInteractor.execute(with: name)
-      DispatchQueue.main.async {
+      await MainActor.run {
         self.selectedPokemon = pokemonDetail
       }
     } catch {
-      DispatchQueue.main.async {
+      await MainActor.run {
         self.shouldShowError = true
       }
     }

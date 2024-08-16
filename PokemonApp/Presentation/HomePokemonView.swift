@@ -13,20 +13,22 @@ struct HomePokemonView: View {
   private let gridLayout: [GridItem] = Array(repeating: .init(.flexible()), count: 2)
   
   var body: some View {
-    NavigationView {
-      ScrollView {
-        LazyVGrid(columns: gridLayout) {
-          ForEach(viewModel.pokemonList, id: \.name) { pokemon in
-            PokemonGridItemView(pokemon: pokemon, viewModel: self.viewModel)
+    ZStack {
+      NavigationView {
+        ScrollView {
+          LazyVGrid(columns: gridLayout) {
+            ForEach(viewModel.pokemonList, id: \.name) { pokemon in
+              PokemonGridItemView(pokemon: pokemon, viewModel: self.viewModel)
+            }
+          }
+          .onAppear() {
+            Task {
+              await viewModel.getPokemonsList()
+            }
           }
         }
-        .onAppear() {
-          Task {
-            await viewModel.getPokemonsList()
-          }
-        }
+        .navigationTitle("Choose a Pokemon")
       }
-      .navigationTitle("Choose a Pokemon")
     }
   }
 }
@@ -37,7 +39,7 @@ struct PokemonGridItemView: View {
   
   var body: some View {
     VStack {
-      AsyncImage(url: URL(string: "")) { image in
+      AsyncImage(url: URL(string: viewModel.selectedPokemon?.sprites.frontDefault ?? "")) { image in
         image.resizable()
       } placeholder: {
         ProgressView()
@@ -46,7 +48,7 @@ struct PokemonGridItemView: View {
       .background(Color.gray.opacity(0.2))
       .cornerRadius(10)
       
-      Text("")
+      Text(viewModel.selectedPokemon?.name ?? "")
         .font(.headline)
         .foregroundColor(.primary)
         .padding(.top, 8)

@@ -26,7 +26,7 @@ struct PokemonRepository: PokemonRepositoryProtocol {
     
     do {
       let list = try decodeData(data: data, as: PokemonListResponse.self)
-      return list.results
+      return list.results ?? []
     } catch {
       print("Decoding error: \(error.localizedDescription)")
       throw FetchingErrors.clientError
