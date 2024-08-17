@@ -31,9 +31,8 @@ struct HomePokemonView: View {
           }
         }
         .navigationTitle("Choose a Pokemon")
-        .background(Color.orange.ignoresSafeArea(.all))
+        .background(Color.red.ignoresSafeArea(.all))
       }
-      .background(Color.red.ignoresSafeArea(.all))
     }
   }
 }
@@ -48,7 +47,7 @@ struct PokemonGridItemView: View {
       } placeholder: {
         ProgressView()
       }
-      .frame(width: 120, height: 120)
+      .frame(width: 180, height: 180)
       .background(Color.gray.opacity(0.4))
       .cornerRadius(20)
       
@@ -58,42 +57,8 @@ struct PokemonGridItemView: View {
         .padding(.top, 8)
     }
     .padding()
-    .cornerRadius(20)
-    .shadow(color: .black.opacity(0.5), radius: 5, x: 0, y: 5)
+    .cornerRadius(50)
+    .shadow(color: .black.opacity(0.1), radius: 5, x: 0, y: 5)
   }
 }
 
-struct DetailedPokemonView: View {
-  var pokemonName: String
-  @ObservedObject var viewModel: PokemonViewModel
-  
-  var body: some View {
-    VStack {
-      if let selectedPokemon = viewModel.selectedPokemon {
-        AsyncImage(url: URL(string: "")) { image in
-          image.resizable()
-        } placeholder: {
-          ProgressView()
-        }
-        .frame(width: 120, height: 120)
-        .background(Color.gray.opacity(0.2))
-        .cornerRadius(10)
-        
-        Text("")
-          .font(.headline)
-          .foregroundColor(.primary)
-          .padding(.top, 8)
-      } else {
-        ProgressView()
-          .onAppear {
-            Task {
-              try await viewModel.getPokemonDetail(with: pokemonName)
-            }
-          }
-      }
-    }
-    .padding()
-    .cornerRadius(10)
-    .navigationTitle(pokemonName.capitalized)
-  }
-}
