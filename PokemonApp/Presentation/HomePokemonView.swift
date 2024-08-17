@@ -14,11 +14,14 @@ struct HomePokemonView: View {
   
   var body: some View {
     ZStack {
+      Color.red.opacity(0.2)
+        .edgesIgnoringSafeArea(.all)
+      
       NavigationView {
         ScrollView {
           LazyVGrid(columns: gridLayout) {
-            ForEach(viewModel.pokemonList, id: \.name) { pokemon in
-              PokemonGridItemView(pokemon: pokemon, viewModel: self.viewModel)
+            ForEach(viewModel.pokemonDetailedList, id: \.name) { pokemon in
+              PokemonGridItemView(pokemon: pokemon)
             }
           }
           .onAppear() {
@@ -28,38 +31,35 @@ struct HomePokemonView: View {
           }
         }
         .navigationTitle("Choose a Pokemon")
+        .background(Color.orange.ignoresSafeArea(.all))
       }
+      .background(Color.red.ignoresSafeArea(.all))
     }
   }
 }
 
 struct PokemonGridItemView: View {
-  var pokemon: Pokemon
-  @ObservedObject var viewModel: PokemonViewModel
+  var pokemon: PokemonDetailResponse
   
   var body: some View {
     VStack {
-      AsyncImage(url: URL(string: viewModel.selectedPokemon?.sprites.frontDefault ?? "")) { image in
+      AsyncImage(url: URL(string: pokemon.sprites.frontDefault)) { image in
         image.resizable()
       } placeholder: {
         ProgressView()
       }
       .frame(width: 120, height: 120)
-      .background(Color.gray.opacity(0.2))
-      .cornerRadius(10)
+      .background(Color.gray.opacity(0.4))
+      .cornerRadius(20)
       
-      Text(viewModel.selectedPokemon?.name ?? "")
+      Text(pokemon.name)
         .font(.headline)
         .foregroundColor(.primary)
         .padding(.top, 8)
     }
-    .onAppear() {
-      Task {
-        try await viewModel.getPokemonDetail(with: pokemon.url)
-      }
-    }
     .padding()
-    .cornerRadius(10)
+    .cornerRadius(20)
+    .shadow(color: .black.opacity(0.5), radius: 5, x: 0, y: 5)
   }
 }
 

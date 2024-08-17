@@ -9,17 +9,18 @@ import Foundation
 
 protocol PokemonViewModelProtocol: ObservableObject {
   var interactors: PokemonInteractorsProtocol { get }
-  var pokemonList: [Pokemon] { get set }
+  var pokemonRawList: [Pokemon] { get set }
   var selectedPokemon: PokemonDetailResponse? { get set }
   var shouldShowError: Bool { get set }
   func getPokemonsList() async
-  func getPokemonDetail(with name: String) async throws
+  func getPokemonDetail(with name: String) async throws -> PokemonDetailResponse?
 }
 
 final class PokemonViewModel: PokemonViewModelProtocol {
-  @Published var pokemonList: [Pokemon] = []
+  @Published var pokemonRawList: [Pokemon] = []
   @Published var shouldShowError: Bool = false
   @Published var selectedPokemon: PokemonDetailResponse?
+  @Published var pokemonDetailedList: [PokemonDetailResponse] = []
   
   var interactors: PokemonInteractorsProtocol
   
@@ -29,9 +30,14 @@ final class PokemonViewModel: PokemonViewModelProtocol {
   
   func getPokemonsList() async {
     do {
-      let list: [Pokemon] = try await interactors.getPokemonsInteractor.execute()
-      await MainActor.run {
-        self.pokemonList = list
+      self.pokemonRawList = try await interactors.getPokemonsInteractor.execute()
+      for pokemon in pokemonRawList {
+        if let detailedPokemon = try await self.getPokemonDetail(with: pokemon.url) {
+          await MainActor.run {
+            self.pokemonDetailedList.append(detailedPokemon)
+            self.pokemonDetailedList = self.pokemonDetailedList.compactMap { $0 }
+          }
+        }
       }
     } catch {
       await MainActor.run {
@@ -40,16 +46,8 @@ final class PokemonViewModel: PokemonViewModelProtocol {
     }
   }
   
-  func getPokemonDetail(with name: String) async throws {
-    do {
-      let pokemonDetail: PokemonDetailResponse = try await interactors.getPokemonDetailInteractor.execute(with: name)
-      await MainActor.run {
-        self.selectedPokemon = pokemonDetail
-      }
-    } catch {
-      await MainActor.run {
-        self.shouldShowError = true
-      }
-    }
+  func getPokemonDetail(with name: String) async throws -> PokemonDetailResponse? {
+    return try? await interactors.getPokemonDetailInteractor.execute(with: name)
   }
 }
+
