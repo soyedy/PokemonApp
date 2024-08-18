@@ -10,28 +10,42 @@ import SwiftUI
 @MainActor
 struct HomePokemonView: View {
   @ObservedObject var viewModel: PokemonViewModel
-  private let gridLayout: [GridItem] = Array(repeating: .init(.flexible()), count: 2)
+  @State var searchTextField: String = ""
+  private let gridLayout: [GridItem] = Array(repeating: .init(.flexible()), count: 3)
   
   var body: some View {
     ZStack {
-      Color.red.opacity(0.2)
-        .edgesIgnoringSafeArea(.all)
-      
-      NavigationView {
-        ScrollView {
-          LazyVGrid(columns: gridLayout) {
-            ForEach(viewModel.pokemonDetailedList, id: \.name) { pokemon in
-              PokemonGridItemView(pokemon: pokemon)
+      VStack {
+        NavigationView {
+          ScrollView {
+            HStack {
+              TextField("Search a pokemon", text: $searchTextField)
+                .frame(height: 20)
+              Button(action: {}) {
+                Image(systemName: "list.bullet")
+                  .font(.headline)
+                  .foregroundStyle(.primary)
+              }
+            }
+            .padding(.vertical, 8)
+            .padding(.horizontal, 20)
+            
+            LazyVGrid(columns: gridLayout) {
+              ForEach(viewModel.pokemonDetailedList, id: \.name) { pokemon in
+                PokemonGridItemView(pokemon: pokemon)
+              }
+            }
+            .onAppear() {
+              Task {
+                await viewModel.getPokemonsList()
+              }
             }
           }
-          .onAppear() {
-            Task {
-              await viewModel.getPokemonsList()
-            }
-          }
+          .navigationTitle("Choose a Pokemon")
+          .fontWeight(.bold)
+          .foregroundStyle(.orange)
         }
-        .navigationTitle("Choose a Pokemon")
-        .background(Color.red.ignoresSafeArea(.all))
+
       }
     }
   }
@@ -41,24 +55,34 @@ struct PokemonGridItemView: View {
   var pokemon: PokemonDetailResponse
   
   var body: some View {
-    VStack {
-      AsyncImage(url: URL(string: pokemon.sprites.frontDefault)) { image in
-        image.resizable()
-      } placeholder: {
-        ProgressView()
+    ZStack {
+      VStack {
+        AsyncImage(url: URL(string: pokemon.sprites.frontDefault)) { image in
+          image.resizable()
+        } placeholder: {
+          ProgressView()
+        }
+        .shadow(color: .primary, radius: 3, x: 0, y: 5)
+        .frame(width: 100, height: 100)
+        .background(Color.blue.opacity(0.09))
+        .clipShape(.buttonBorder)
+        
+        Text(pokemon.name)
+          .font(.headline)
+          .foregroundColor(.primary)
       }
-      .frame(width: 180, height: 180)
-      .background(Color.gray.opacity(0.4))
-      .cornerRadius(20)
-      
-      Text(pokemon.name)
-        .font(.headline)
-        .foregroundColor(.primary)
-        .padding(.top, 8)
+      .padding()
     }
-    .padding()
-    .cornerRadius(50)
-    .shadow(color: .black.opacity(0.1), radius: 5, x: 0, y: 5)
   }
 }
 
+struct ContentView_Previews: PreviewProvider {
+  static var previews: some View {
+    HomePokemonView(
+      viewModel: PokemonViewModel(
+        interactors: PokemonInteractors(
+          getPokemonsInteractor: GetPokemonList(
+            repository: PokemonRepository()),
+          getPokemonDetailInteractor: GetPokemonDetail(
+            repository: PokemonRepository()))))    }
+}
