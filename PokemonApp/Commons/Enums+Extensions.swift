@@ -12,3 +12,17 @@ enum FetchingErrors: Error {
   case clientError
   case unexpectedError
 }
+
+enum PresentationMode {
+  case grid(items: [PokemonDetailResponse])
+  case list(items: [PokemonDetailResponse])
+  
+  mutating func toggle() {
+    switch self {
+    case .grid(let items):
+      self = .list(items: items)
+    case .list(let items):
+      self = .grid(items: items)
+    }
+  }
+}

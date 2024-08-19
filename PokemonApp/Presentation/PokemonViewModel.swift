@@ -10,7 +10,6 @@ import Foundation
 protocol PokemonViewModelProtocol: ObservableObject {
   var interactors: PokemonInteractorsProtocol { get }
   var pokemonRawList: [Pokemon] { get set }
-  var selectedPokemon: PokemonDetailResponse? { get set }
   var shouldShowError: Bool { get set }
   func getPokemonsList() async
   func getPokemonDetail(with name: String) async throws -> PokemonDetailResponse?
@@ -19,7 +18,6 @@ protocol PokemonViewModelProtocol: ObservableObject {
 final class PokemonViewModel: PokemonViewModelProtocol {
   @Published var pokemonRawList: [Pokemon] = []
   @Published var shouldShowError: Bool = false
-  @Published var selectedPokemon: PokemonDetailResponse?
   @Published var pokemonDetailedList: [PokemonDetailResponse] = []
   
   var interactors: PokemonInteractorsProtocol
@@ -36,6 +34,7 @@ final class PokemonViewModel: PokemonViewModelProtocol {
           await MainActor.run {
             self.pokemonDetailedList.append(detailedPokemon)
             self.pokemonDetailedList = self.pokemonDetailedList.compactMap { $0 }
+            self.pokemonDetailedList.shuffle()
           }
         }
       }
