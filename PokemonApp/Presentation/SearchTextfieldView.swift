@@ -9,7 +9,8 @@ import Foundation
 import SwiftUI
 
 struct SearchTextfieldView: View {
-  @State var searchText: String
+  @Binding var searchText: String
+  @ObservedObject var viewModel: PokemonViewModel
   var presentationMode: PresentationMode
   var title: String
   var action: (() -> Void)
@@ -18,6 +19,9 @@ struct SearchTextfieldView: View {
     HStack {
       TextField(title, text: $searchText)
         .frame(height: 20)
+        .onChange(of: searchText) {
+          viewModel.filterPokemons(by: searchText)
+        }
       Button(action: action) {
         switch presentationMode {
         case .grid:

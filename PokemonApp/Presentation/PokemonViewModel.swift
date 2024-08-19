@@ -19,6 +19,7 @@ final class PokemonViewModel: PokemonViewModelProtocol {
   @Published var pokemonRawList: [Pokemon] = []
   @Published var shouldShowError: Bool = false
   @Published var pokemonDetailedList: [PokemonDetailResponse] = []
+  @Published var pokemonFilteredList: [PokemonDetailResponse] = []
   
   var interactors: PokemonInteractorsProtocol
   
@@ -35,6 +36,7 @@ final class PokemonViewModel: PokemonViewModelProtocol {
             self.pokemonDetailedList.append(detailedPokemon)
             self.pokemonDetailedList = self.pokemonDetailedList.compactMap { $0 }
             self.pokemonDetailedList.shuffle()
+            self.pokemonFilteredList = pokemonDetailedList
           }
         }
       }
@@ -47,6 +49,17 @@ final class PokemonViewModel: PokemonViewModelProtocol {
   
   func getPokemonDetail(with name: String) async throws -> PokemonDetailResponse? {
     return try? await interactors.getPokemonDetailInteractor.execute(with: name)
+  }
+  
+  func filterPokemons(by searchText: String) {
+    let trimmedSearchText = searchText.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+    if trimmedSearchText.isEmpty {
+      self.pokemonFilteredList = pokemonDetailedList
+    } else {
+      self.pokemonFilteredList = pokemonDetailedList.filter { pokemon in
+        pokemon.name.lowercased().contains(trimmedSearchText)
+      }
+    }
   }
 }
 

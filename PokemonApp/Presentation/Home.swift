@@ -12,7 +12,7 @@ struct HomePokemonView: View {
   @ObservedObject var viewModel: PokemonViewModel
   @State var searchTextField: String = ""
   @State private var isDataLoaded: Bool = false
-  @State var presentationMode: PresentationMode = .grid(items: [])
+  @State var presentationMode: PresentationMode = .grid
   
   var body: some View {
     ZStack {
@@ -20,17 +20,21 @@ struct HomePokemonView: View {
         NavigationView {
           ScrollView {
             SearchTextfieldView(
-              searchText: searchTextField, presentationMode: presentationMode,
+              searchText: $searchTextField, 
+              viewModel: viewModel,
+              presentationMode: presentationMode,
               title: "Search a pokemon") {
-                withAnimation(.easeOut) {
+                withAnimation(.linear) {
                   presentationMode.toggle()
                 }
               }
               .fontWeight(.bold)
-              .foregroundStyle(.orange)
+              .foregroundStyle(Color("AccentColor"))
             Divider()
             if isDataLoaded {
-              PokemonPresentationView(style: presentationMode)
+              PokemonPresentationView(
+                viewModel: viewModel,
+                style: presentationMode)
             }
           }
           .background(Color("pokemon-colors"))
@@ -48,7 +52,6 @@ struct HomePokemonView: View {
   private func fetchData() async {
     await viewModel.getPokemonsList()
     DispatchQueue.main.async {
-      presentationMode = .grid(items: viewModel.pokemonDetailedList)
       isDataLoaded = true
     }
   }

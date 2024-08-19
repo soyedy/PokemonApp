@@ -3,6 +3,28 @@
    version = "1.0">
    <ContextStates>
       <ContextState
+         contextName = "PokemonViewModel.filterPokemons(by:):PokemonViewModel.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "searchText.isEmpty">
+            </PersistentString>
+            <PersistentString
+               value = "self.pokemonFilteredList.count">
+            </PersistentString>
+            <PersistentString
+               value = "self.pokemonDetailedList.count">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "closure #1 in closure #1 in SearchTextfieldView.body.getter:SearchTextfieldView.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "searchText">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
          contextName = "PokemonPresentationView.body.getter:Home.swift">
          <PersistentStrings>
             <PersistentString
@@ -15,6 +37,25 @@
          <PersistentStrings>
             <PersistentString
                value = "presentationMode">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "closure #1 in HomePokemonView.fetchData():Home.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "viewModel.pokemonFilteredList.count">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "closure #1 in PokemonViewModel.filterPokemons(by:):PokemonViewModel.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "pokemon.name">
+            </PersistentString>
+            <PersistentString
+               value = "self.pokemonFilteredList.count">
             </PersistentString>
          </PersistentStrings>
       </ContextState>

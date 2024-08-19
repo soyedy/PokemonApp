@@ -9,19 +9,20 @@ import Foundation
 import SwiftUI
 
 struct PokemonPresentationView: View {
+  @ObservedObject var viewModel: PokemonViewModel
   var style: PresentationMode
   private let gridLayout: [GridItem] = Array(repeating: .init(.flexible()), count: 3)
   
   var body: some View {
     switch style {
-    case .grid(let items):
+    case .grid:
       LazyVGrid(columns: gridLayout) {
-        ForEach(items, id: \.id) { pokemon in
+        ForEach(viewModel.pokemonFilteredList, id: \.id) { pokemon in
           PokemonGridItemView(pokemon: pokemon)
         }
       }
-    case .list(let items):
-      ForEach(items, id: \.id) { pokemon in
+    case .list:
+      ForEach(viewModel.pokemonFilteredList, id: \.id) { pokemon in
         PokemonListItemView(pokemon: pokemon)
       }
     }

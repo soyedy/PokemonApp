@@ -14,7 +14,7 @@ enum PokemonService {
   var getAddress: URL {
     switch self {
     case .getBaseUrl:
-      return URL(string: "https://pokeapi.co/api/v2/pokemon?limit=50")!
+      return URL(string: "https://pokeapi.co/api/v2/pokemon?limit=500")!
     case .searchByName(let pokemonName):
       return URL(string: "https://pokeapi.co/api/v2/pokemon/\(pokemonName)")!
     }
